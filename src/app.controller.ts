@@ -21,6 +21,7 @@ import { randomUUID } from 'crypto';
 import path, { extname } from 'path';
 import fs from 'fs';
 import type { Request, Response } from 'express';
+import { PrismaService } from './persistence/prisma/prisma.service';
 
 @Controller()
 export class AppController {
@@ -124,16 +125,17 @@ export class AppController {
     const range = req.headers.range;
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
+      console.log(parts);
       const start = parseInt(parts[0], 10);
       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-      const chunksize = end - start + 1;
+      const chunkSize = end - start + 1;
       const file = fs.createReadStream(videoPath, { start, end });
 
       res.writeHead(HttpStatus.PARTIAL_CONTENT, {
         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
         'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
+        'Content-Length': chunkSize,
         'Content-Type': 'video/mp4',
       });
 
